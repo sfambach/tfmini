@@ -48,15 +48,16 @@ uint16_t TFMini::getDistance() {
   while (takeMeasurement() != 0) {
     numMeasurementAttempts += 1;
     if (numMeasurementAttempts > TFMINI_MAX_MEASUREMENT_ATTEMPTS) {
-      Serial.println ("TF Mini error: too many measurement attempts");
-      Serial.println ("Last error:");
-      if (state == ERROR_SERIAL_NOHEADER)     Serial.println("ERROR_SERIAL_NOHEADER");
-      if (state == ERROR_SERIAL_BADCHECKSUM)  Serial.println("ERROR_SERIAL_BADCHECKSUM");
-      if (state == ERROR_SERIAL_TOOMANYTRIES) Serial.println("ERROR_SERIAL_TOOMANYTRIES");      
       
       state = ERROR_SERIAL_TOOMANYTRIES;
       distance = -1;
-      strength = -1;      
+      strength = -1;  
+      
+      if (state == ERROR_SERIAL_NOHEADER)     return -2;
+      if (state == ERROR_SERIAL_BADCHECKSUM)  return -3;
+      if (state == ERROR_SERIAL_TOOMANYTRIES) return -4;      
+      
+     
       return -1;      
     }
   }
@@ -156,7 +157,7 @@ int TFMini::takeMeasurement() {
       state = ERROR_SERIAL_NOHEADER;
       distance = -1;
       strength = -1;     
-      if (TFMINI_DEBUGMODE == 1) Serial.println("ERROR: no header");
+      // if (TFMINI_DEBUGMODE == 1) Serial.println("ERROR: no header");
       return -1;      
     }
     
@@ -186,7 +187,7 @@ int TFMini::takeMeasurement() {
     state = ERROR_SERIAL_BADCHECKSUM;
     distance = -1;
     strength = -1;
-    if (TFMINI_DEBUGMODE == 1) Serial.println("ERROR: bad checksum");
+    //if (TFMINI_DEBUGMODE == 1) Serial.println("ERROR: bad checksum");
     return -1;
   }
 
